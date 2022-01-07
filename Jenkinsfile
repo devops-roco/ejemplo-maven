@@ -9,7 +9,7 @@ pipeline {
             steps {
                checkout(
                         [$class: 'GitSCM',
-                        branches: [[name: "pipeline-as-code" ]],
+                        branches: [[name: "webhook" ]],
                         userRemoteConfigs: [[url: 'https://github.com/devops-roco/ejemplo-maven.git']]])
             }
         }
