@@ -5,24 +5,16 @@ def jsonParse(def json) {
 pipeline {
     agent any
     stages {
-        stage("Paso 1: Descargar y cambiar a rama"){
-            steps {
-               checkout(
-                        [$class: 'GitSCM',
-                        branches: [[name: "webhook" ]],
-                        userRemoteConfigs: [[url: 'https://github.com/devops-roco/ejemplo-maven.git']]])
-            }
-        }
-        stage("Paso 2: Compilar"){
+        stage("Paso 1: Compilar"){
             steps {
                 script {
-                sh "echo 'Compilando codigo!'"
+                sh "echo 'Compilacion de codigo!'"
                 // Run Maven on a Unix agent.
                 sh "mvn clean compile -e"
                 }
             }
         }
-        stage("Paso 3: Testear"){
+        stage("Paso 2: Pruebas"){
             steps {
                 script {
                 sh "echo 'Ejecutando pruebas!'"
@@ -31,7 +23,7 @@ pipeline {
                 }
             }
         }
-        stage("Paso 4: Construir .Jar"){
+        stage("Paso 3: Construyendo .Jar"){
             steps {
                 script {
                 sh "echo 'Construyendo .Jar!'"
@@ -39,17 +31,23 @@ pipeline {
                 sh "mvn clean package -e"
                 }
             }
+            post {
+                //record the test results and archive the jar file.
+                success {
+                    archiveArtifacts artifacts:'build/*.jar'
+                }
+            }
         }
     }
     post {
         always {
-            sh "echo 'fase always executed post'"
+            sh "echo 'Mensaje que siempre se ejecuta'"
         }
         success {
             sh "echo 'Proceso exitoso'"
         }
         failure {
-            sh "echo 'Proceso Fallido'"
+            sh "echo 'Proceso fallido'"
         }
     }
 }
