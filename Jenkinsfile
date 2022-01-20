@@ -24,26 +24,27 @@ pipeline {
                 }
             }
         }
-        stage("Paso 3: Sonar"){
+        stage("Paso 3: Build .Jar"){
             steps {
                 script {
-                sh "echo 'Construyendo .Jar!'"
+                sh "echo 'Build .Jar!'"
                 // Run Maven on a Unix agent.
                 sh "mvn clean package -e"
                 }
-              }
-            }
-        }
-        stage("Paso 4: Construyendo .Jar"){
-            steps {
-                withSonarQubeEnv('sonarqube') {
-                sh 'mvn sonar:sonar'
-               
             }
             post {
                 //record the test results and archive the jar file.
                 success {
                     archiveArtifacts artifacts:'build/*.jar'
+                }
+            }
+        }
+        stage("Paso 4: Análisis SonarQube"){
+            steps {
+                withSonarQubeEnv('sonarqube') {
+                    sh "echo 'Ejecutando analisis de SonarQube!'"
+                    // Run Maven on a Unix agent to execute Sonar.
+                    sh 'mvn sonar:sonar'
                 }
             }
         }
