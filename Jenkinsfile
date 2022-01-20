@@ -20,7 +20,7 @@ pipeline {
                 script {
                 sh "echo 'Ejecutando pruebas!'"
                 // Run Maven on a Unix agent.
-                sh "mvn clean test -e"
+                sh "mvn clean test"
                 }
             }
         }
