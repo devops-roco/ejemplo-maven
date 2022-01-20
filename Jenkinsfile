@@ -27,7 +27,7 @@ pipeline {
         stage("Paso 3: Build .Jar"){
             steps {
                 script {
-                sh "echo 'Build .Jar!'"
+                sh "echo 'Construyendo .Jar!'"
                 // Run Maven on a Unix agent.
                 sh "mvn clean package -e"
                 }
