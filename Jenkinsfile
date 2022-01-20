@@ -26,18 +26,19 @@ pipeline {
         }
         stage("Paso 3: Sonar"){
             steps {
-                withSonarQubeEnv('sonarqube') {
-                sh 'mvn clean package sonar:sonar'
-              }
-            }
-        }
-        stage("Paso 4: Construyendo .Jar"){
-            steps {
                 script {
                 sh "echo 'Construyendo .Jar!'"
                 // Run Maven on a Unix agent.
                 sh "mvn clean package -e"
                 }
+              }
+            }
+        }
+        stage("Paso 4: Construyendo .Jar"){
+            steps {
+                withSonarQubeEnv('sonarqube') {
+                sh 'mvn sonar:sonar'
+               
             }
             post {
                 //record the test results and archive the jar file.
