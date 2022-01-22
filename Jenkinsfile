@@ -1,4 +1,3 @@
-
 import groovy.json.JsonSlurperClassic
 def jsonParse(def json) {
     new groovy.json.JsonSlurperClassic().parseText(json)
@@ -6,8 +5,8 @@ def jsonParse(def json) {
 pipeline {
     agent any
     environment {
-        NEXUS_USER         = credentials('admin')
-        NEXUS_PASSWORD     = credentials('droco1993')
+        NEXUS_USER         = credentials('user-admin')
+        NEXUS_PASSWORD     = credentials('user-pass')
     }
     stages {
         stage("Paso 1: Compilar"){
@@ -43,7 +42,7 @@ pipeline {
                 }
             }
         }
-        stage("Paso 4: Análisis SonarQube"){
+        stage("Paso 4: Análisis SonarQube y Despliegue en Nexus"){
             steps {
                 withSonarQubeEnv('sonarqube') {
                     sh "echo 'Ejecutando analisis de SonarQube!'"
@@ -61,7 +60,7 @@ pipeline {
                             [$class: 'MavenPackage',
                                 mavenAssetList: [
                                     [classifier: '',
-                                    extension: '.jar',
+                                    extension: '',
                                     filePath: 'build/DevOpsUsach2020-0.0.1.jar']
                                 ],
                         mavenCoordinate: [
@@ -76,18 +75,17 @@ pipeline {
         }
         stage("Paso 5: Descarga desde Nexus") {
             steps {
-                //http://nexus3:10003/repository/devops-usach-nexus/com/devopsusach2020/DevOpsUsach2020/0.0.2/DevOpsUsach2020-0.0.2.jar
                 sh ' curl -X GET -u $NEXUS_USER:$NEXUS_PASSWORD "http://nexus:8081/repository/devops-usach-nexus/com/devopsusach2020/DevOpsUsach2020/0.0.1/DevOpsUsach2020-0.0.1.jar" -O'
             }
         }
         stage("Paso 6: Levantar Springboot APP"){
             steps {
-                sh 'nohup bash java -jar DevOpsUsach2020-0.0.1.jar & >/dev/null'
+                sh 'java -jar DevOpsUsach2020-0.0.1.jar &'
             }
         }
-        stage("Paso 7: Dormir(Esperar 10sg) "){
+        stage("Paso 7: Dormir(Esperar 20sg) "){
             steps {
-                sh 'sleep 10'
+                sh 'sleep 20'
             }
         }
         stage("Paso 8: Test Alive Service - Testing Application!"){
@@ -95,7 +93,7 @@ pipeline {
                 sh 'curl -X GET "http://localhost:8081/rest/mscovid/test?msg=testing"'
             }
         }
-        stage("Subir nueva Version"){
+        stage("Paso 9: Subir nueva Version"){
             steps {
                 //archiveArtifacts artifacts:'build/*.jar'
                 nexusPublisher nexusInstanceId: 'nexus',
@@ -104,7 +102,7 @@ pipeline {
                         [$class: 'MavenPackage',
                             mavenAssetList: [
                                 [classifier: '',
-                                extension: '.jar',
+                                extension: '',
                                 filePath: 'DevOpsUsach2020-0.0.1.jar']
                             ],
                     mavenCoordinate: [
