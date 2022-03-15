@@ -53,6 +53,25 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>com.lazerycode.jmeter</groupId>
+				<artifactId>jmeter-maven-plugin</artifactId>
+				<version>2.7.0</version>
+				<executions>
+					<execution>
+						<id>jmeter-tests</id>
+						<goals>
+							<goal>jmeter</goal>
+						</goals>
+						<phase>verify</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<generateReports>true</generateReports>
+					<resultsFileFormat>xml</resultsFileFormat>
+					<testResultsTimestamp>true</testResultsTimestamp>
+				</configuration>
+			</plugin>
 		</plugins>
 		<directory>build</directory>
 	</build>
